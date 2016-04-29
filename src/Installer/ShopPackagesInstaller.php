@@ -47,16 +47,23 @@ class ShopPackagesInstaller extends LibraryInstaller
     }
 
     /**
-     * @param PackageInterface $package
+     * {@inheritDoc}
      */
-    public function installPackage(PackageInterface $package)
+    public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
+        parent::install($repo, $package);
         $installer = $this->createInstaller($package->getType());
-        if (!$installer->isInstalled($package)) {
             $installer->install($package, $this->getInstallPath($package));
-        } else {
-            $installer->update($package, $this->getInstallPath($package));
         }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
+    {
+        parent::update($repo, $initial, $target);
+        $installer = $this->createInstaller($initial->getType());
+        $installer->update($initial, $this->getInstallPath($initial));
     }
 
     /**

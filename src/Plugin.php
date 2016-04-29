@@ -23,59 +23,15 @@
 namespace OxidEsales\ComposerPlugin;
 
 use Composer\Composer;
-use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use OxidEsales\ComposerPlugin\Installer\ShopPackagesInstaller;
 
-class Plugin implements PluginInterface, EventSubscriberInterface
+class Plugin implements PluginInterface
 {
-    /** @var Composer */
-    private $composer;
-
-    /** @var IOInterface */
-    private $io;
-
-
-    /**
-     * Register events.
-     *
-     * @return array
-     */
-    public static function getSubscribedEvents()
-    {
-        return array(
-            'post-install-cmd' => 'installPackages',
-            'post-update-cmd' => 'installPackages'
-        );
-    }
-
-    /**
-     * Register shop packages installer.
-     *
-     * @param Composer    $composer
-     * @param IOInterface $io
-     */
     public function activate(Composer $composer, IOInterface $io)
     {
         $installer = new ShopPackagesInstaller($io, $composer);
         $composer->getInstallationManager()->addInstaller($installer);
-
-        $this->composer = $composer;
-        $this->io = $io;
-    }
-
-    /**
-     * Run installation for oxid packages.
-     */
-    public function installPackages()
-    {
-        $repo = $this->composer->getRepositoryManager()->getLocalRepository();
-        $packagesInstaller = new ShopPackagesInstaller($this->io, $this->composer);
-        foreach ($repo->getPackages() as $package) {
-            if ($packagesInstaller->supports($package->getType())) {
-                $packagesInstaller->installPackage($package);
-            }
-        }
     }
 }
